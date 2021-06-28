@@ -12,7 +12,6 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       PackageType: Image
-      Description: Build AWS Observability layer
       MemorySize: 512
       Timeout: 60
       Policies:
@@ -33,13 +32,12 @@ Resources:
       DockerContext: ./
 Metadata:
   AWS::ServerlessRepo::Application:
-    Name: AWS-Distro-for-OpenTelemetry-Java-Sample
-    Description: AWS Distro for Opentelemetry Java Sample
-    Author: aws-observability
+    Name: OpenTelemetry-Java-Sample-Metrics
+    Description:  Opentelemetry Java Sample App for Metrics
+    Author: opentelemetry-authors
     SpdxLicenseId: Apache-2.0
     LicenseUrl: LICENSE
     ReadmeUrl: README.md
     Labels: ['opentelemetry', 'java', 'sample']
-    HomePageUrl: https://aws.amazon.com/products/management-and-governance/use-cases/monitoring-and-observability/
     SemanticVersion: 0.1.0
-    SourceCodeUrl: https://github.com/aws-observability/aws-otel-lambda/sample-apps/java-lambda
+    SourceCodeUrl: https://github.com/open-telemetry/opentelemetry-lambda/tree/main/java/sample-apps/metrics

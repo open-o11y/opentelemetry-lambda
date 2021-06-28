@@ -16,11 +16,11 @@ COPY --from=build /app/dependencies/*.jar ./
 COPY --from=build /app/spark-sample-app-1.0 .
 
 ENV HOME=/root
-ENV OTEL_RESOURCE_ATTRIBUTES 'service.namespace=AWSOTel,service.name=AWSOTelSampleApp'
+ENV OTEL_RESOURCE_ATTRIBUTES 'service.namespace=OTel,service.name=OTelSampleApp'
 ENV OTEL_EXPORTER_OTLP_ENDPOINT 'localhost:55680'
 
-ADD aws_observability/build/extensions /opt/extensions
-ADD aws_observability/build/aoc /opt/aoc
+ADD opentelemetry/build/ /opt/
+# ADD opentelemetry/build/collector /opt/collector
 
 ENTRYPOINT [ "/usr/bin/java", "-cp", "./*", "com.amazonaws.services.lambda.runtime.api.client.AWSLambda" ]
 CMD ["com.amazon.sampleapp.App::handleRequest"]
