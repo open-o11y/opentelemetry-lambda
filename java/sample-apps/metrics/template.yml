@@ -11,6 +11,9 @@ Resources:
   function:
     Type: AWS::Serverless::Function
     Properties:
+      Environment:
+        Variables:
+          OPENTELEMETRY_COLLECTOR_CONFIG_FILE: /var/task/collector.yaml # check if correct path 
       PackageType: Image
       MemorySize: 512
       Timeout: 60

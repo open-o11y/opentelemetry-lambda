@@ -1,3 +1,4 @@
+# TEMP CHANGE TO THIS FILE (need to move to corret folder in metrics java sample app)
 receivers:
   otlp:
     protocols:
@@ -7,6 +8,9 @@ receivers:
 exporters:
   logging:
     loglevel: debug
+  prometheusremotewrite: 
+    endpoint: "http://localhost:9411/api/prom/push"
+    insecure: true # temporarily to avoid setting cert_file and key_file
 
 service:
   pipelines:
@@ -16,3 +20,6 @@ service:
     metrics:
       receivers: [otlp]
       exporters: [logging]
+    metrics/2:
+      receivers: [otlp]
+      exporters: [prometheusremotewrite]
