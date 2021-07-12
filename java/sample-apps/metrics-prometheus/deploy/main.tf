@@ -6,7 +6,7 @@ module "hello-lambda-function" {
   runtime       = "java11"
 
   create_package         = false
-  local_existing_package = "${path.module}/../../build/libs/aws-sdk-all.jar"
+  local_existing_package = "${path.module}/../build/libs/aws-sdk-all.jar"
 
   memory_size = 384
   timeout     = 20
@@ -37,7 +37,7 @@ module "hello-lambda-function" {
 }
 
 module "api-gateway" {
-  source = "../../../../../utils/terraform/api-gateway-proxy"
+  source = "../../../../utils/terraform/api-gateway-proxy"
 
   name                = var.name
   function_name       = module.hello-lambda-function.lambda_function_name
