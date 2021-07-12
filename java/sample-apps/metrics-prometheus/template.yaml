@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample SAM Template for java-lambda-metrics
+
+Resources:
+  SampleMetricsApp:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SampleMetricsApp
+      Handler: metrics.App::handleRequest
+      Runtime: java11
+      MemorySize: 512
+      Timeout: 60
+      Environment:
+        Variables:
+          OTEL_EXPORTER_OTLP_ENDPOINT: localhost:55680
+          OTEL_RESOURCE_ATTRIBUTES: service.namespace=OTel,service.name=OTelSampleApp
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - AWSLambda_ReadOnlyAccess
+        - CloudWatchAgentServerPolicy
+        - AmazonPrometheusRemoteWriteAccess
+        - AmazonPrometheusConsoleFullAccess
+        - AmazonPrometheusFullAccess
+        - AmazonPrometheusQueryAccess
+      Layers:
+        - !FindInMap [RegionMap, !Ref "AWS::Region", layer]
+      Events:
+        getEndpoint:
+          Type: Api 
+          Properties:
+            Path: /
+            Method: get
+Mappings:
+  RegionMap:
+     #TODO: add other regions once their layer arns are available
+
+    us-east-1:
+      layer: "arn:aws:lambda:us-east-1:614732350472:layer:otel-collector-with-awsprw:1" # custom collector layer with the AWSPRW exporter
+
+  
