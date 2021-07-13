@@ -19,5 +19,6 @@ include(":layer-javaagent")
 include(":layer-wrapper")
 include(":sample-apps:aws-sdk")
 include(":sample-apps:okhttp")
+include(":sample-apps:metrics-prometheus")
 
 rootProject.name = "opentelemetry-lambda-java"
