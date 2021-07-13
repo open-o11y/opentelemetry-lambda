@@ -12,8 +12,7 @@ module "hello-lambda-function" {
   timeout     = 20
 
   layers = compact([
-    var.collector_layer_arn,
-    var.sdk_layer_arn
+    var.collector_layer_arn
   ])
 
   environment_variables = {
