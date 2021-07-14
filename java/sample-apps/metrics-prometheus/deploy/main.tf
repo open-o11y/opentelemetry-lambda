@@ -6,7 +6,7 @@ module "hello-lambda-function" {
   runtime       = "java11"
 
   create_package         = false
-  local_existing_package = "${path.module}/../../build/libs/metrics-prometheus-all.jar"
+  local_existing_package = "${path.module}/../SampleMetricsApp/build/libs/SampleMetricsApp.jar"
 
   memory_size = 384
   timeout     = 20
