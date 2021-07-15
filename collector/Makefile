@@ -1,7 +1,7 @@
 BASE_SPACE:=$(shell pwd)
 BUILD_SPACE:=$(BASE_SPACE)/build
 BUCKET_NAME:=lambda-artifacts-$(shell dd if=/dev/random bs=8 count=1 2>/dev/null | od -An -tx1 | tr -d ' \t\n')
-LAYER_NAME:=otel-collector
+LAYER_NAME:=otel-collector-with-awsprw
 
 VERSION=$(shell cat VERSION)
 GIT_SHA=$(shell git rev-parse HEAD)
@@ -9,7 +9,9 @@ GOBUILD=GO111MODULE=on CGO_ENABLED=0 installsuffix=cgo go build -trimpath
 BUILD_INFO_IMPORT_PATH=main
 
 LDFLAGS=-ldflags "-s -w -X $(BUILD_INFO_IMPORT_PATH).GitHash=$(GIT_SHA) -X $(BUILD_INFO_IMPORT_PATH).Version=$(VERSION) \
--X github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsxrayexporter.collectorDistribution=opentelemetry-collector-lambda"
+-X github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsxrayexporter.collectorDistribution=aws-otel-collector-lambda"
+
+# -X github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsprometheusremotewriteexporter.collectorDistribution=aws-otel-collector-lambda"
 
 clean:
 	rm -rf build/
