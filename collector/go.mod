@@ -5,6 +5,7 @@ go 1.16
 replace github.com/open-telemetry/opentelemetry-lambda/collector/lambdacomponents => ./lambdacomponents
 
 require (
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsprometheusremotewriteexporter v0.29.0 // indirect
 	github.com/open-telemetry/opentelemetry-lambda/collector/lambdacomponents v0.0.0
 	go.opentelemetry.io/collector v0.29.0
 )
