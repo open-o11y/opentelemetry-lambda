@@ -1,7 +1,15 @@
 BASE_SPACE:=$(shell pwd)
 BUILD_SPACE:=$(BASE_SPACE)/build
 BUCKET_NAME:=lambda-artifacts-$(shell dd if=/dev/random bs=8 count=1 2>/dev/null | od -An -tx1 | tr -d ' \t\n')
-LAYER_NAME:=otel-collector-with-awsprw
+# LAYER_NAME:=otel-collector-with-awsprw-ws3
+# LAYER_NAME:=otel-collector-with-awsprw-ws2
+# LAYER_NAME:=otel-collector-with-awsprw-ws3
+# LAYER_NAME:=otel-collector-with-awsprw-ws4
+# LAYER_NAME:=otel-collector-with-awsprw-ws5
+# LAYER_NAME:=otel-collector-with-awsprw-ws6
+# LAYER_NAME:=otel-collector-with-awsprw-ws7
+# LAYER_NAME:=otel-collector-with-awsprw-ws8
+LAYER_NAME:=otel-collector-with-awsprw-ws9
 
 VERSION=$(shell cat VERSION)
 GIT_SHA=$(shell git rev-parse HEAD)

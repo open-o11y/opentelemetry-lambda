@@ -8,11 +8,19 @@ exporters:
   logging:
     loglevel: debug
   awsprometheusremotewrite: 
-    endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-aa651671-f9af-4237-9f4f-b77476b4a77a/api/v1/remote_write"
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-6d254440-a6d0-42ed-b092-6eda15798f1d/ap?i/v1/remote_write" #
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-6d254440-a6d0-42ed-b092-6eda15798f1d/api/v1/remote_write" #ws1
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-e54a9a29-3ac4-4a74-b33a-f2cad91fada5/api/v1/remote_write" #ws2
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-bc09c38a-a247-4c2a-9e00-f1fb5a5b620e/api/v1/remote_write" #ws3
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-49f7dcd1-eb41-4ba8-8fc7-62f2ba4c13e1/api/v1/remote_write" #ws4
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-07d8d8e7-1020-48aa-b35f-71955350e8d2/api/v1/remote_write" #ws5
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-0ed95d6a-e543-4f5d-a2b6-26a745fe7262/api/v1/remote_write" #ws6
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-6b582df9-6b77-4547-9dae-f0e0a47447d5/api/v1/remote_write" #ws7
+    # endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-f056983e-8e2b-4d3e-b357-8e75d56e5abf/api/v1/remote_write" #ws8
+    endpoint: "https://aps-workspaces.us-east-1.amazonaws.com/workspaces/ws-9671c47e-61bd-4c7f-86ee-d4cb5674a9cb/api/v1/remote_write" #ws9
     aws_auth:
       service: "aps"
       region: "us-east-1"
-    
 
 service:
   pipelines:
