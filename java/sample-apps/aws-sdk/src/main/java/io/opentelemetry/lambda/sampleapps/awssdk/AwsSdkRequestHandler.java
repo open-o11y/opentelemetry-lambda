@@ -5,7 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import io.opentelemetry.api.metrics.GlobalMeterProvider;
-import io.opentelemetry.api.metrics.LongUpDownCounter;
+import io.opentelemetry.api.metrics.LongSumObserver;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.common.Labels;
 import org.apache.logging.log4j.LogManager;
@@ -15,13 +15,33 @@ public class AwsSdkRequestHandler
     implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
   private static final Logger logger = LogManager.getLogger(AwsSdkRequestHandler.class);
-  private static final Meter sampleMeter = GlobalMeterProvider.getMeter("aws-otel", "1.0");
-  private static final LongUpDownCounter queueSizeCounter =
-      sampleMeter
-          .longUpDownCounterBuilder("queueSizeChange")
-          .setDescription("Queue Size change")
+  private static final Meter meter = GlobalMeterProvider.getMeter("aws-otel", "1.0");
+  private static long totalBytesSent = 0;
+
+  private static final LongSumObserver totalBytesSentObserver =
+      meter
+          .longSumObserverBuilder("totalApiBytesSentMetricName")
+          .setDescription("Total API request load sent in bytes")
           .setUnit("one")
+          .setUpdater(
+              longResult -> {
+                System.out.println(
+                    "emit total http request size "
+                        + totalBytesSent
+                        + " byte, "
+                        + "apiNameValue"
+                        + ","
+                        + "statusCodeValue");
+                longResult.observe(
+                    totalBytesSent,
+                    Labels.of(
+                        "DIMENSION_API_NAME",
+                        "apiNameValue",
+                        "DIMENSION_STATUS_CODE",
+                        "statusCodeValue"));
+              })
           .build();
+  ;
 
   @Override
   public APIGatewayProxyResponseEvent handleRequest(
@@ -31,10 +51,16 @@ public class AwsSdkRequestHandler
     APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
 
     // Generate a sample counter metric using the OpenTelemetry Java Metrics API
-    queueSizeCounter.add(2, Labels.of("apiName", "apiName", "statuscode", "200"));
 
-    response.setBody("finished emitting metric");
+    totalBytesSent += 1;
+    // Metric is 0 even with this sleep.
+    // try {
+    //   Thread.sleep(15000);
+    // } catch (InterruptedException e) {
+    //   e.printStackTrace();
+    // }
+    // response.setBody("finished emitting metric");
 
-    return response;
+    return response.withStatusCode(200).withBody("Status Code 200");
   }
 }
