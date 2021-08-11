@@ -1,7 +1,7 @@
 variable "name" {
   type        = string
   description = "Name of created function and API Gateway"
-  default     = "hello-java-awssdk-agent"
+  default     = "metrics-java-agent"
 }
 
 variable "collector_layer_arn" {

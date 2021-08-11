@@ -10,8 +10,6 @@ import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.common.Labels;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 
 public class AwsSdkRequestHandler
     implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
@@ -31,14 +29,11 @@ public class AwsSdkRequestHandler
     logger.info("Serving lambda request.");
 
     APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
-    try (S3Client s3 = S3Client.create()) {
-      ListBucketsResponse listBucketsResponse = s3.listBuckets();
-      response.setBody(
-          "Hello lambda - found " + listBucketsResponse.buckets().size() + " buckets.");
-    }
 
     // Generate a sample counter metric using the OpenTelemetry Java Metrics API
     queueSizeCounter.add(2, Labels.of("apiName", "apiName", "statuscode", "200"));
+
+    response.setBody("finished emitting metric");
 
     return response;
   }
