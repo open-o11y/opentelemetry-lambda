@@ -18,13 +18,13 @@ module "hello-lambda-function" {
     var.collector_config_layer_arn,
   ])
 
-  environment_variables =  (var.collector_config_layer_arn == null? 
-  {
-    AWS_LAMBDA_EXEC_WRAPPER = "/opt/otel-handler",
-  } : 
-  {
-    AWS_LAMBDA_EXEC_WRAPPER = "/opt/otel-handler",
-    OPENTELEMETRY_COLLECTOR_CONFIG_FILE	= "/opt/config.yaml"
+  environment_variables = (var.collector_config_layer_arn == null ?
+    {
+      AWS_LAMBDA_EXEC_WRAPPER = "/opt/otel-handler",
+    } :
+    {
+      AWS_LAMBDA_EXEC_WRAPPER             = "/opt/otel-handler",
+      OPENTELEMETRY_COLLECTOR_CONFIG_FILE = "/opt/config.yaml"
   })
 
   tracing_mode = var.tracing_mode
