@@ -1,22 +1,4 @@
-/*
- * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * SPDX-License-Identifier: MIT-0
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-package com.amazon.sampleapp;
+package metrics;
 
 import io.grpc.ManagedChannelBuilder;
 import io.opentelemetry.api.metrics.GlobalMetricsProvider;
@@ -28,6 +10,7 @@ import io.opentelemetry.sdk.metrics.SdkMeterProvider;
 import io.opentelemetry.sdk.metrics.export.IntervalMetricReader;
 import io.opentelemetry.sdk.metrics.export.MetricExporter;
 import io.opentelemetry.sdk.autoconfigure.OpenTelemetrySdkAutoConfiguration;
+import io.opentelemetry.api.metrics.LongUpDownCounter;
 
 import java.util.Collections;
 
@@ -36,9 +19,8 @@ public class MetricEmitter {
   static final String DIMENSION_API_NAME = "apiName";
   static final String DIMENSION_STATUS_CODE = "statusCode";
 
-  static String API_LATENCY_METRIC = "latency";
-
-  LongValueRecorder apiLatencyRecorder;
+  LongUpDownCounter queueSizeCounter;
+  LongValueRecorder histogram;
 
   String latencyMetricName;
   IntervalMetricReader reader;
@@ -59,32 +41,39 @@ public class MetricEmitter {
             .build();
     Meter meter = GlobalMetricsProvider.getMeter("aws-otel", "1.0");
 
-    latencyMetricName = API_LATENCY_METRIC;
+    queueSizeCounter =
+            meter
+                .longUpDownCounterBuilder("testmetric4")
+                .setDescription("Queue Size change")
+                .setUnit("one")
+                .build();
 
-    apiLatencyRecorder =
-        meter
-            .longValueRecorderBuilder(latencyMetricName)
-            .setDescription("API latency time")
-            .setUnit("ms")
-            .build();
-
+   histogram =
+           meter
+                .longValueRecorderBuilder("testLongValueRecorder")
+                .setDescription("My very own counter")
+                .setUnit("metric tonnes")
+                .build();
   }
 
   /**
-   * emit http request latency metrics with summary metric type
+   * emit http request queue size metrics
    *
    * @param returnTime
    * @param apiName
    * @param statusCode
    */
-  public void emitReturnTimeMetric(Long returnTime, String apiName, String statusCode) {
-    apiLatencyRecorder.record(
-        returnTime, Labels.of(DIMENSION_API_NAME, apiName, DIMENSION_STATUS_CODE, statusCode));
-    System.out.println(
-            "emit metric (name:latency) " + returnTime + "," + apiName + "," + statusCode + "," + latencyMetricName);
-  }
+  public void emitQueueSizeChangeMetric(long queueSizeChange, String apiName, String statusCode) {
+        System.out.println(
+            "emit metric with queue size change " + queueSizeChange + "," + apiName + "," + statusCode);
+        queueSizeCounter.add(
+            queueSizeChange, Labels.of(DIMENSION_API_NAME, apiName, DIMENSION_STATUS_CODE, statusCode));
+      }
 
-  public void shutDown() {
-    reader.shutdown();
+  public void emitHistogram(long size, String apiName, String statusCode) {
+        System.out.println(
+                "emit histogram " + size + "," + apiName + "," + statusCode);
+        histogram.record(
+                size, Labels.of(DIMENSION_API_NAME, apiName, DIMENSION_STATUS_CODE, statusCode));
   }
 }

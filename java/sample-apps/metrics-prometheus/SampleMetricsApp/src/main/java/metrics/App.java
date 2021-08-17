@@ -26,9 +26,15 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         
         MetricEmitter metricEmitter = buildMetricEmitter();
-        metricEmitter.emitQueueSizeChangeMetric(1, "/lambda-sample-app", "200");
-        System.out.println("[I!]Returning from lambda handler...");
 
+        metricEmitter.emitQueueSizeChangeMetric((long) 500, "/lambda-sample-app", "200");
+        metricEmitter.emitHistogram((long) 10.5, "test", "test");
+
+        try {
+            Thread.sleep(10000);
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
         return response.withStatusCode(200).withBody("Status Code 200");
     }
 }

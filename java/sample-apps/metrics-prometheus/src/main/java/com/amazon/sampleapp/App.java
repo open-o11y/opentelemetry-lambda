@@ -1,51 +1,42 @@
-/*
- * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * SPDX-License-Identifier: MIT-0
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+package metrics;
 
-package com.amazon.sampleapp;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 
-public class App implements RequestHandler<Void, String> {
+/**
+ * Handler for requests to Lambda function.
+ */
+public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-  private static MetricEmitter buildMetricEmitter() {
-    return new MetricEmitter();
-  }
-
-  @Override
-  public String handleRequest(Void input, Context context) {
-    System.out.println("[I!]Launching sample app from lambda handler...");
-    long requestStartTime = System.currentTimeMillis();
-    MetricEmitter metricEmitter = buildMetricEmitter();
-    System.out.println("[I!]Emitting latency metric...");
-    long latency = System.currentTimeMillis() - requestStartTime;
-    metricEmitter.emitReturnTimeMetric(latency, "/lambda-sample-app", "200");
-    String message = new String("200 OK");
-    System.out.println("[I!]Returning from lambda handler...");
-//    TODO: the below code needs to be called to replace 'sleep' once the graceful shutdown change has been released from upstream. https://github.com/open-telemetry/opentelemetry-java/pull/2936
-//    metricEmitter.shutDown();
-    try {
-      System.out.println("[I!]Sleeping for 15s...");
-      Thread.sleep(1000 * 15);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    private static MetricEmitter buildMetricEmitter() {
+        return new MetricEmitter();
     }
-    return message;
-  }
+
+    public APIGatewayProxyResponseEvent handleRequest(final APIGatewayProxyRequestEvent input, final Context context) {
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        
+        MetricEmitter metricEmitter = buildMetricEmitter();
+        for (long i = 0; i < 500; i++) {
+            metricEmitter.emitQueueSizeChangeMetric(i + (long) 500, "/lambda-sample-app", "200");
+            metricEmitter.emitHistogram((long) i, "/lambda-sample-app", "200");
+            metricEmitter.emitHistogram((long) i, "/lambda-sample-app", "200");  
+        }        
+
+        try {
+            Thread.sleep(10000);
+        } catch (Exception e) {
+            //TODO: handle exception
+        }
+        return response.withStatusCode(200).withBody("Status Code 200");
+    }
 }
