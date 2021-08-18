@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import io.opentelemetry.api.metrics.GlobalMeterProvider;
 import io.opentelemetry.api.metrics.LongUpDownCounter;
+import io.opentelemetry.api.metrics.LongValueRecorder;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.common.Labels;
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +26,14 @@ public class AwsSdkRequestHandler
           .setUnit("one")
           .build();
 
+  private static final LongUpDownCounter latencyRecorder =
+        sampleMeter
+          .longValueRecorderBuilder("latencyMetricTime")
+          .setDescription("API latency time")
+          .setUnit("ms")
+          .build();
+
+
   @Override
   public APIGatewayProxyResponseEvent handleRequest(
       APIGatewayProxyRequestEvent input, Context context) {
@@ -39,6 +48,9 @@ public class AwsSdkRequestHandler
 
     // Generate a sample counter metric using the OpenTelemetry Java Metrics API
     queueSizeCounter.add(2, Labels.of("apiName", "apiName", "statuscode", "200"));
+
+    // Generate a sample histogram metric
+    latencyRecorder.record(2, Labels.of("apiName", "apiName", "statuscode", "200"));
 
     return response;
   }
