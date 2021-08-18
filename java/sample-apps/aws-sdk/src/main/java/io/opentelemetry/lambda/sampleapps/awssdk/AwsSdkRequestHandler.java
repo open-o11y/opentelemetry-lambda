@@ -26,7 +26,7 @@ public class AwsSdkRequestHandler
           .setUnit("one")
           .build();
 
-  private static final LongUpDownCounter latencyRecorder =
+  private static final LongValueRecorder latencyRecorder =
         sampleMeter
           .longValueRecorderBuilder("latencyMetricTime")
           .setDescription("API latency time")
