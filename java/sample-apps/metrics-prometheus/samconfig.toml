@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "demo-java-amp-app"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1jqceskb9qg3z"
+s3_prefix = "demo-java-amp-app"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"

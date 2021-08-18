@@ -9,6 +9,8 @@ import io.opentelemetry.api.metrics.GlobalMeterProvider;
 import io.opentelemetry.api.metrics.MeterProvider;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.api.metrics.LongCounter;
+import io.opentelemetry.api.common.Attributes;
+import static io.opentelemetry.api.common.AttributeKey.stringKey;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.MeterProvider;
 import io.opentelemetry.sdk.metrics.SdkMeterProvider;
@@ -24,77 +26,44 @@ import java.util.*;
 
 
 public class MetricEmitter {
-
-  static final String DIMENSION_API_NAME = "apiName";
-  static final String DIMENSION_STATUS_CODE = "statusCode";
-
-  LongHistogram histogram;
+  LongHistogram apiLatency;
   LongCounter queueSizeCounter;
-//   LongSumObserver cpuObserver;
-
-  String latencyMetricName;
-  IntervalMetricReader reader;
 
   public MetricEmitter() {
-    String otelExporterOtlpEndpoint = System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT") != null ? System.getenv("OTEL_EXPORTER_OTLP_ENDPOINT") : "127.0.0.1:55680";
-    SdkMeterProvider meterProvider = SdkMeterProvider.builder().buildAndRegisterGlobal();
-    OtlpGrpcMetricExporter metricExporter = OtlpGrpcMetricExporter.builder().setChannel(
-            ManagedChannelBuilder.forTarget(otelExporterOtlpEndpoint).usePlaintext().build())
-            .build();
-    reader =
-        IntervalMetricReader.builder()
-        .setMetricExporter(metricExporter)
-        .setMetricProducers(Collections.singleton(SdkMeterProvider.builder().buildAndRegisterGlobal()))
-        .setExportIntervalMillis(1000)
-        .buildAndStart();
     Meter meter = GlobalMeterProvider.get().get("io.opentelemetry.example");
 
     queueSizeCounter =
             meter
-                .counterBuilder("testmetric4")
+                .counterBuilder("queueSizechange")
                 .setDescription("Queue Size change")
                 .setUnit("one")
                 .build();
 
-   histogram =
+   apiLatency =
            meter
-                .histogramBuilder("testmetric5")
+                .histogramBuilder("apiLatency")
                 .ofLongs()
-                .setUnit("metric tonnes")
+                .setDescription("api Latency")
+                .setUnit("ms")
                 .build();
 
-//   cpuObserver =
-//            meter
-//                 .longSumObserverBuilder("cpu_time")
-//                 .setDescription("System CPU usage")
-//                 .setUnit("ms")
-//                 .setUpdater(
-//                    longResult -> {
-//                         longResult.observe(
-//                             10,
-//                             Labels.of(
-//                                 "apiName",
-//                                 "apiName"));
-//                       })
-//                 .build();
+    meter
+      .gaugeBuilder("jvm.memory.total")
+      .setDescription("Reports JVM memory usage.")
+      .setUnit("byte")
+      .buildWithCallback(
+          result -> result.observe(Runtime.getRuntime().totalMemory(), Attributes.empty()));
   }
 
-//   /**
-//    * emit http request queue size metrics
-//    *
-//    * @param returnTime
-//    * @param apiName
-//    * @param statusCode
-//    */
-  public void emitQueueSizeChangeMetric(Long queueSizeChange, String apiName, String statusCode) {
+  public void emitQueueSizeChangeMetric(long queueSizeChange, String apiName, String statusCode) {
         System.out.println(
             "emit metric with queue size change " + queueSizeChange + "," + apiName + "," + statusCode);
         queueSizeCounter.add(queueSizeChange);
       }
 
-  public void emitHistogram(long size, String apiName, String statusCode) {
+  public void emitLatency(long latency, String apiName, String statusCode) {
         System.out.println(
-                "emit histogram " + size + "," + apiName + "," + statusCode);
-        histogram.record(size);
+                "emit metric with api latency " + latency + "," + apiName + "," + statusCode);
+        apiLatency.record(latency, Attributes.of(stringKey("apiName"), apiName, stringKey("statusCode"), statusCode));
   }
 }

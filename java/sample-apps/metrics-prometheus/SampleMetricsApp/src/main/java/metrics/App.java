@@ -27,14 +27,9 @@ public class App implements RequestHandler<APIGatewayProxyRequestEvent, APIGatew
         
         MetricEmitter metricEmitter = buildMetricEmitter();
 
-        metricEmitter.emitQueueSizeChangeMetric((long) 500, "/lambda-sample-app", "200");
-        metricEmitter.emitHistogram((long) 10.5, "test", "test");
+        metricEmitter.emitQueueSizeChangeMetric(0, "/lambda-sample-app", "200");
+        metricEmitter.emitLatency(10, "apiName", "200");
 
-        try {
-            Thread.sleep(10000);
-        } catch (Exception e) {
-            //TODO: handle exception
-        }
         return response.withStatusCode(200).withBody("Status Code 200");
     }
 }

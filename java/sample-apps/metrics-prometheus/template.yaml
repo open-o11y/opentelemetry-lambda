@@ -19,10 +19,7 @@ Resources:
         - AWSLambdaBasicExecutionRole
         - AWSLambda_ReadOnlyAccess
         - CloudWatchAgentServerPolicy
-        - AmazonPrometheusRemoteWriteAccess
-        - AmazonPrometheusConsoleFullAccess
         - AmazonPrometheusFullAccess
-        - AmazonPrometheusQueryAccess
       Layers:
         - !FindInMap [RegionMap, !Ref "AWS::Region", layer]
       Events:
@@ -36,6 +33,6 @@ Mappings:
      #TODO: add other regions once their layer arns are available
 
     us-east-1:
-      layer: "arn:aws:lambda:us-east-1:149220036719:layer:otel-collector-with-awsprw:1" # custom collector layer with the AWSPRW exporter
+      layer: "arn:aws:lambda:us-east-1:149220036719:layer:java-agent-with-prw:1" # custom collector layer with the AWSPRW exporter
 
   
