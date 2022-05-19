@@ -2,10 +2,10 @@ name: "Pull Request (Python)"
 
 on:
   pull_request:
-    paths:
-    - 'python/**'
     branches:
       - main
+    paths:
+      - 'python/**'
 
 env:
   AWS_REGION: us-east-1
